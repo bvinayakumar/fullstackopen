@@ -1,0 +1,12 @@
+actor User
+User->browser: User types a note in textbox
+User->browser: User clicks on Save button
+
+note over browser:
+browser executes the form onsubmit event handler
+that redraws notes (existing notes and the new note created)
+and sends request to server to add new note 
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: Note created
