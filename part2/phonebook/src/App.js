@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
+import personService from './services/persons'
 
 import axios from 'axios'
 
@@ -20,16 +21,25 @@ const App = () => {
   const addPerson = event => {
     event.preventDefault()
 
-    if (persons.find(p => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+    const foundPerson = persons.find(p => p.name === newName)
+    if (foundPerson) {
+      const changedPerson = { ...foundPerson, name: newName, number: newNumber }
+      const id = foundPerson.id
+      personService.update(id, changedPerson).then(returnedPerson => {
+        setPersons(persons.map(person => (person.id !== id ? person : returnedPerson)))
+        setNewName('')
+        setNewNumber('')
+      })
     } else if (newName && newNumber) {
       const personObject = {
         name: newName,
         number: newNumber
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      personService.create(personObject).then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
     }
   }
 
@@ -43,6 +53,14 @@ const App = () => {
 
   const handleNameFilterChange = event => {
     setNameFilter(event.target.value)
+  }
+
+  const handleDelete = person => () => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService
+      .remove(person.id)
+      .then(() => setPersons(persons.filter(p => p.id !== person.id)))
+    }
   }
 
   let personsToShow = nameFilter.length
@@ -66,7 +84,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} onDelete={handleDelete} />
     </div>
   )
 }
