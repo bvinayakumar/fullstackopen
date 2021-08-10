@@ -5,8 +5,6 @@ import Filter from './components/Filter'
 import personService from './services/persons'
 import Notification from './components/Notification'
 
-import axios from 'axios'
-
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -15,8 +13,8 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data)
+    personService.getAll().then(persons => {
+      setPersons(persons)
     })
   }, [])
 
