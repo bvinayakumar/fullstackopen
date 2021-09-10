@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     personService.getAll().then(persons => {
@@ -63,6 +64,15 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+      }).catch(error => {
+        setNotificationMessage(
+          `${error}`
+        )
+        setIsError(true)
+        setTimeout(() => {
+          setNotificationMessage(null)
+          setIsError(false)
+        }, 5000)
       })
     }
   }
@@ -96,7 +106,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notificationMessage} />
+      <Notification message={notificationMessage} isError={isError} />
       <Filter name={nameFilter} onChange={handleNameFilterChange} />
 
       <h2>Add a new</h2>
